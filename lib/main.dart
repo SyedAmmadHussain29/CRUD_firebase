@@ -48,92 +48,98 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  final results = await FilePicker.platform.pickFiles(
-                    allowMultiple: false,
-                    type: FileType.custom,
-                    allowedExtensions: ['png', 'jpg', 'jpeg'],
-                  );
-                  if (results == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('no file'),
-                      ),
-                    );
-                    return null;
-                  }
-                  final path = results.files.single.path;
-                  final fileName = results.files.single.name;
-                  storage
-                      .uploadFile(path!, fileName)
-                      .then((value) => print('Done'));
-                  print(path);
-                  print(fileName);
-                },
-                child: const Text("Upload File"),
-              ),
-            ),
-            FutureBuilder(
-              future: storage.listFiles(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<firebase_storage.ListResult> snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    height: 50,
-                    child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        itemCount: snapshot.data!.items.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              child: Text(snapshot.data!.items[index].name),
-                            ),
-                          );
-                        }),
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.waiting ||
-                    !snapshot.hasData) {
-                  return const CircularProgressIndicator();
-                }
-                return Container();
-              },
-            ),
-            FutureBuilder(
-              future: storage
-                  .downloadURL('WhatsApp Image 2023-01-14 at 4.58.20 PM.jpeg'),
-              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  return Container(
-                    width: 300,
-                    height: 250,
-                    child: Image.network(
-                      snapshot.data!,
-                      fit: BoxFit.cover,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Center(
+            child: ElevatedButton(
+              onPressed: () async {
+                final results = await FilePicker.platform.pickFiles(
+                  allowMultiple: false,
+                  type: FileType.custom,
+                  allowedExtensions: ['png', 'jpg', 'jpeg'],
+                );
+                if (results == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('no file'),
                     ),
                   );
+                  return null;
                 }
-                if (snapshot.connectionState == ConnectionState.waiting ||
-                    !snapshot.hasData) {
-                  return const CircularProgressIndicator();
-                }
-                return Container();
+                final path = results.files.single.path;
+                final fileName = results.files.single.name;
+                storage
+                    .uploadFile(path!, fileName)
+                    .then((value) => print('Done'));
+                print(path);
+                print(fileName);
               },
-            )
-          ],
-        ),
+              child: const Text("Upload File"),
+            ),
+          ),
+          FutureBuilder(
+            future: storage.listFiles(),
+            builder: (BuildContext context,
+                AsyncSnapshot<firebase_storage.ListResult> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.hasData) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  height: 50,
+                  width: MediaQuery.of(context).size.width,
+                  child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.items.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // storage
+                              //     .getImages(snapshot.data!.items[index].name);
+                            },
+                            child: Text(snapshot.data!.items[index].name),
+                          ),
+                        );
+                      }),
+                );
+              }
+              if (snapshot.connectionState == ConnectionState.waiting ||
+                  !snapshot.hasData) {
+                return const CircularProgressIndicator();
+              }
+              return Container(
+                child: const Text("data"),
+              );
+            },
+          ),
+          FutureBuilder(
+            future: storage.downloadURL('pexels-pixabay-60597.jpg'),
+            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.hasData) {
+                return Container(
+                  width: 300,
+                  height: 200,
+                  child: Image.network(
+                    snapshot.data!,
+                    fit: BoxFit.cover,
+                  ),
+                );
+              }
+              if (snapshot.connectionState == ConnectionState.waiting ||
+                  !snapshot.hasData) {
+                return const CircularProgressIndicator();
+              }
+              return Container(
+                child: const Text("data"),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

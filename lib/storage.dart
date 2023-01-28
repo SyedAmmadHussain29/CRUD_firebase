@@ -24,8 +24,21 @@ class Storage {
     results.items.forEach((firebase_storage.Reference ref) {
       print('Found file: $ref');
     });
+
+    print(results.items);
+    await Future.forEach(results.items, (element) async {
+      String url = await element.getDownloadURL();
+      print(url);
+    });
     return results;
   }
+
+  // getImages(ref) {
+  //   var a = storage.ref('$ref').getDownloadURL();
+  //   // print(a
+  //   // )
+  //   log(a.toString());
+  // }
 
   Future<String> downloadURL(String imageName) async {
     String downloadURL = await storage.ref('test/$imageName').getDownloadURL();
